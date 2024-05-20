@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+    logstash: 
+       image: docker.elastic.co/logstash/logstash:8.13.0
+       container_name: Logstash
+       environment:
+             XPACK_MONITORING_ENABLED: "false"
+       ports:
+            - 8081:8080
+       networks: 
+            tap:
+                ipv4_address: 10.0.100.22
+       volumes:
+            - ./docker_logstash/pipeline/log.conf:/usr/share/logstash/pipeline/logstash.conf
+    telegram_bot:
+           image: telegram_bot:latest
+           environment:
+              TOKEN: 7190507006:AAF4E2TiAvtq6VzJxMvF3G1RDQsdWmgpaxQ   
+           networks: 
+              tap:
+                 ipv4_address: 10.0.100.23
+networks:
+    tap:
+        name: tap
+        driver: bridge
+        ipam: 
+            config:
+                 - subnet: 10.0.100.1/24
+        external: true
+

@@ -3,6 +3,8 @@ from telegram.ext import ApplicationBuilder,CommandHandler,ContextTypes
 import requests;
 import os;
 
+#IL BOT AD UNA RICHIESTA DELL'UTENTE FA RICHIESTA GET DELL'API E MANDA I DATI A LOGSTASH 
+#LOGSTASH LI PRENDE E LI MANDA A KAFKA
 async def fixtures_function(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     payload={}
     headers = {
