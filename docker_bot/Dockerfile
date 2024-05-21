@@ -2,7 +2,7 @@ FROM python
 #mi serve per poter eseguire il file python direttamente
 ENV PATH /usr/src/app/bin:$PATH
 #TOKEN TELEGRAM BOT(POTREI PASSARLO DA LINEA DI COMANDO)
-ENV TOKEN 7190507006:AAF4E2TiAvtq6VzJxMvF3G1RDQsdWmgpaxQ   
+#ENV TOKEN  my token
 WORKDIR  /usr/src/app
 
 #scarico i pacchetti che mi servono in python
