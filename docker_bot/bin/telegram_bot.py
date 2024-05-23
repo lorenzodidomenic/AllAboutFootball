@@ -1,29 +1,33 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder,CommandHandler,ContextTypes
 import requests;
-import os;
 
-#IL BOT AD UNA RICHIESTA DELL'UTENTE FA RICHIESTA GET DELL'API E MANDA I DATI A LOGSTASH 
-#LOGSTASH LI PRENDE E LI MANDA A KAFKA
+#queste due sono librerie già inglobate in python
+import os;
+import json 
+
+
+
+#il bot ad una richiesta dell'utente fa richiesta all'api e li manda a logstash 
 async def fixtures_function(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     payload={}
     headers = {
     'x-rapidapi-key': 'de48be3afdca7c3582798fb0273f6915',
     'x-rapidapi-host': 'v3.football.api-sports.io'
     }
-    url = "https://v3.football.api-sports.io/fixtures?season=2023&league=135"
+    url = "https://v3.football.api-sports.io/countries"
     response = requests.request("GET", url, headers=headers, data=payload)
 
-    print(response.text)
-    await update.message.reply_text('Hello, request to Football Api done')
+    json_object = json.loads(response.text)  #questo lo devo inviare a logstash
+    r = requests.request("POST",url='http://10.0.100.22:8080',json=json_object)  #indirizzo ip di logstash nella rete dei container
+
+    await update.message.reply_text('Ok')
 
 token = os.environ["TOKEN"]    #token api telegram bot
 app = ApplicationBuilder().token(token).build()
 
-
 app.add_handler(CommandHandler("results",fixtures_function))
 
 app.run_polling()
-
 
 #potremmo predire risultati prossimi anni 
