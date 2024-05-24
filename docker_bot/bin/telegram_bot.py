@@ -12,7 +12,7 @@ import json
 async def fixtures_function(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     payload={}
     headers = {
-    'x-rapidapi-key': 'de48be3afdca7c3582798fb0273f6915',
+    #'x-rapidapi-key': 'your api key',
     'x-rapidapi-host': 'v3.football.api-sports.io'
     }
     url = "https://v3.football.api-sports.io/countries"
