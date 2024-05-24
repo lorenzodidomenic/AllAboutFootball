@@ -46,7 +46,7 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            #environment:
-             #TOKEN: 7190507006:AAF4E2TiAvtq6VzJxMvF3G1RDQsdWmgpaxQ
+             #TOKEN: 
            networks: 
               tap:
                  ipv4_address: 10.0.100.23
