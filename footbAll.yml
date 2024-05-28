@@ -1,36 +1,55 @@
 version: '3.7'
 services:
-    kafka-server:
-        image: apache/kafka:latest   #utilizzo immagine ufficiale di kafka, ha bisogno di tutte quelle variabili d'ambiente
-        hostname: broker
-        container_name: broker
-        ports:
-            - '9092:9092'
+    zookeeper:
+        image: confluentinc/cp-zookeeper:7.4.4
+        hostname: zookeper
+        container_name: zookeper
         environment:
-            KAFKA_NODE_ID: 1
-            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-            KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT_HOST://broker:9092,PLAINTEXT://broker:19092'
-            KAFKA_PROCESS_ROLES: 'broker,controller'
-            KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
-            KAFKA_LISTENERS: 'CONTROLLER://:29093,PLAINTEXT_HOST://:9092,PLAINTEXT://:19092'
-            KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
-            KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-            CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+        networks: 
+            - tap
+        ports:
+            - 22181:2181
+    kafkaServer:
+        image: confluentinc/cp-kafka:7.4.4
+        hostname: kafkaServer
+        container_name: kafkaServer
+        depends_on:
+           - zookeeper
+        ports:
+           - 29092:29092
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkaServer:9092,PLAINTEXT_HOST://localhost:29092
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-            KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
         networks: 
               tap:
                  ipv4_address: 10.0.100.24
+    kafka-ui:
+        image: provectuslabs/kafka-ui:latest
+        container_name: kafkaWebUI
+        environment:
+            - KAFKA_CLUSTERS_0_NAME=local
+            - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafkaServer:9092
+        ports: 
+            - 8082:8080
+        networks: 
+            - tap
+        depends_on:
+            - kafkaServer
     kart-topics:
         image: apache/kafka:latest    #creo nuobo container solo per utilizzare l'eseguibile per creare un topic
         command: > 
                bash -c "
-               /opt/kafka/bin/kafka-topics.sh --create --topic topicCountries --bootstrap-server broker:9092"
+               /opt/kafka/bin/kafka-topics.sh --create --topic topicCountries --bootstrap-server kafkaServer:9092"
         depends_on:
-             - kafka-server
+             - kafkaServer
+        networks: 
+            - tap
     logstash: 
         image: docker.elastic.co/logstash/logstash:8.13.0
         container_name: Logstash

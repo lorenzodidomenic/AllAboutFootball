@@ -15,7 +15,7 @@ async def fixtures_function(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     #'x-rapidapi-key': 'your api key',
     'x-rapidapi-host': 'v3.football.api-sports.io'
     }
-    url = "https://v3.football.api-sports.io/countries"
+    url = "https://v3.football.api-sports.io/fixtures?league=135&season=2023"
     response = requests.request("GET", url, headers=headers, data=payload)
 
     json_object = json.loads(response.text)  #questo lo devo inviare a logstash
