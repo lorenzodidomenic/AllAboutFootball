@@ -41,13 +41,14 @@ services:
             - tap
         depends_on:
             - kafkaServer
-    kart-topics:
+    kafka-topics:
         image: apache/kafka:latest    #creo nuobo container solo per utilizzare l'eseguibile per creare un topic
         command: > 
                bash -c "
                /opt/kafka/bin/kafka-topics.sh --create --topic topicCountries --bootstrap-server kafkaServer:9092"
         depends_on:
-             - kafkaServer
+            - kafkaServer
+
         networks: 
             - tap
     logstash: 
@@ -69,6 +70,20 @@ services:
            networks: 
               tap:
                  ipv4_address: 10.0.100.23
+    spark:
+        image: apache/spark
+        hostname: spark
+        container_name: spark
+        volumes:
+              - ./docker_spark/sparkApplication.py:/opt/tap/sparkApplication.py
+        command: > 
+             /opt/spark/bin/spark-submit --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1  /opt/tap/sparkApplication.py 
+        networks: 
+                tap:
+                   ipv4_address: 10.0.100.20
+        depends_on:
+            kafka-topics:
+                condition: service_completed_successfully
 networks:
     tap:
         name: tap

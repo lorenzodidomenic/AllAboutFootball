@@ -12,10 +12,10 @@ import json
 async def fixtures_function(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     payload={}
     headers = {
-    #'x-rapidapi-key': 'your api key',
+   # 'x-rapidapi-key': 'your api ky',
     'x-rapidapi-host': 'v3.football.api-sports.io'
     }
-    url = "https://v3.football.api-sports.io/fixtures?league=135&season=2023"
+    url = "https://v3.football.api-sports.io/countries"
     response = requests.request("GET", url, headers=headers, data=payload)
 
     json_object = json.loads(response.text)  #questo lo devo inviare a logstash
