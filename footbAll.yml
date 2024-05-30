@@ -65,8 +65,8 @@ services:
                - ./docker_logstash/pipeline/log.conf:/usr/share/logstash/pipeline/logstash.conf
     telegram_bot:
            image: telegram_bot:latest
-           #environment:
-             #TOKEN: 
+          # environment:
+            # TOKEN:  
            networks: 
               tap:
                  ipv4_address: 10.0.100.23
