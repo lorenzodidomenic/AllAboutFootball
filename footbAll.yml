@@ -66,9 +66,9 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-            # TOKEN:  
-             URL: https://v3.football.api-sports.io/standings?league=135&season=2023
-            # API-KEY: 
+            # TOKEN:  7190507006:AAF4E2TiAvtq6VzJxMvF3G1RDQsdWmgpaxQ 
+            # URL: https://v3.football.api-sports.io/standings?league=135&season=2023
+            # API-KEY: de48be3afdca7c3582798fb0273f6915
            networks: 
               tap:
                  ipv4_address: 10.0.100.23
