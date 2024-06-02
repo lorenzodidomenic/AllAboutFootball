@@ -10,12 +10,17 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import *
 
 from pyspark.sql.types import *
-
+from pyspark.sql import functions as F
 
 #creiamo lo Spark Context della nostra applicazione
-sc = SparkContext(appName="PythonStructuredStreamsKafka")
-spark = SparkSession(sc)
-sc.setLogLevel("ERROR")
+#sc = SparkContext(appName="PythonStructuredStreamsKafka")
+#spark = SparkSession(sc)
+#sc.setLogLevel("ERROR")
+
+spark = SparkSession.builder.appName("FootbALL").getOrCreate()
+# To reduce verbose output
+spark.sparkContext.setLogLevel("ERROR") 
+
 
 kafkaServer="kafkaServer:9092"
 topic = "topicCountries"
@@ -30,9 +35,9 @@ df = spark \
   .option("subscribe", topic) \
   .load()
 
-df=df.selectExpr("CAST(timestamp AS STRING)","CAST(value AS STRING)") \
+#df=df.selectExpr("CAST(timestamp AS STRING)","CAST(value AS STRING)") \
 
-df.printSchema()  
+#df.printSchema()  
 #finora lo schema è (timestamp,value) dove value contiene un json 
 
 
@@ -73,9 +78,12 @@ parseDf = df.selectExpr("CAST(value AS STRING)") \
 
 #parseDf.select("parsed.response.league.standings")
 
+parseDf = parseDf.groupBy("name").agg(F.collect_list("rank"),F.collect_list("points"),F.collect_list("for"),F.collect_list("against"))
+
 parseDf.writeStream \
-  .outputMode("Append")\
+  .outputMode("complete")\
   .format('console')\
-  .option('truncate', 'false')\
+  .option('truncate', value=False) \
+  .option("numRows",10000)\
   .start()\
   .awaitTermination()
