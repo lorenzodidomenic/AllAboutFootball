@@ -71,7 +71,7 @@ services:
              #API-KEY: 
            networks: 
               tap:
-                 ipv4_address: 10.0.100.2
+                 ipv4_address: 10.0.100.23
     spark:
         image: apache/spark
         hostname: spark
