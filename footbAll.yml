@@ -67,11 +67,11 @@ services:
            image: telegram_bot:latest
            environment:
              #TOKEN:  
-             URL: https://v3.football.api-sports.io/standings?league=135&season=
+             URL: https://v3.football.api-sports.io/standings?
              #API-KEY: 
            networks: 
               tap:
-                 ipv4_address: 10.0.100.23
+                 ipv4_address: 10.0.100.2
     spark:
         image: apache/spark
         hostname: spark
@@ -85,7 +85,7 @@ services:
                    ipv4_address: 10.0.100.20
         depends_on:
             kafka-topics:
-                condition: service_completed_successfully
+                condition: service_completed_successfully         
 networks:
     tap:
         name: tap
