@@ -66,14 +66,14 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-             #TOKEN:  
+            #TOKEN:  
              URL: https://v3.football.api-sports.io/standings?
-             #API-KEY: 
+            #API-KEY: 
            networks: 
               tap:
                  ipv4_address: 10.0.100.23
     spark:
-        image: apache/spark
+        image: spark:latest
         hostname: spark
         container_name: spark
         volumes:
