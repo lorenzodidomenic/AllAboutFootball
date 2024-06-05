@@ -48,7 +48,6 @@ services:
                /opt/kafka/bin/kafka-topics.sh --create --topic topicCountries --bootstrap-server kafkaServer:9092"
         depends_on:
             - kafkaServer
-
         networks: 
             - tap
     logstash: 
@@ -66,9 +65,9 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-             #TOKEN:  
+            # TOKEN:  
              URL: https://v3.football.api-sports.io/standings?
-             #API-KEY: 
+            # API-KEY: 
            networks: 
               tap:
                  ipv4_address: 10.0.100.23
@@ -80,13 +79,25 @@ services:
               - ./docker_spark/sparkApplication.py:/opt/tap/sparkApplication.py
               - footbAllVolume:/tmp
         command: > 
-             /opt/spark/bin/spark-submit --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1  /opt/tap/sparkApplication.py 
+             /opt/spark/bin/spark-submit --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.2,org.elasticsearch:elasticsearch-spark-30_2.12:8.13.4 /opt/tap/sparkApplication.py 
         networks: 
                 tap:
                    ipv4_address: 10.0.100.20
         depends_on:
             kafka-topics:
-                condition: service_completed_successfully         
+                condition: service_completed_successfully   
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+        environment:
+            - discovery.type=single-node
+            - xpack.security.enabled=false
+        mem_limit: 1 GB   
+        ports:
+            - 9200:9200
+        networks: 
+                tap:
+                    ipv4_address: 10.0.100.21
+                    
 networks:
     tap:
         name: tap

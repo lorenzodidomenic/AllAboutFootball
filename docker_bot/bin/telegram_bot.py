@@ -92,7 +92,8 @@ async def fixtures_function(update: Update, context: ContextTypes.DEFAULT_TYPE) 
       if i != 2011:
          time.sleep(5)  #tra una richiesta e l'altra si ferma 6 secondi
 
-      url = str(os.environ["URL"])+"league="+str(id)+"&season="+str(i)+"&team="+str(id_team)
+      url = str(os.environ["URL"])+"league="+str(id)+"&season="+str(i)
+      #+"&team="+str(id_team)
       response = requests.request("GET", url, headers=headers, data=payload)
 
       json_object = json.loads(response.text)  #questo lo devo inviare a logstash

@@ -17,11 +17,19 @@ from pyspark.ml import Pipeline
 from pyspark.ml.pipeline import PipelineModel
 #from pyspark.ml.evaluation import RegressionEvaluator
 
+from pyspark.conf import SparkConf
+
 #creiamo lo Spark Context della nostra applicazione
 #sc = SparkContext(appName="PythonStructuredStreamsKafka")
 #spark = SparkSession(sc)
 #sc.setLogLevel("ERROR")
-spark = SparkSession.builder.appName("FootbALL").getOrCreate()
+
+elastic_index = "football"
+
+sparkConf = SparkConf().set("es.nodes","elasticsearch")\
+                     .set("es.port","9200")
+
+spark = SparkSession.builder.appName("FootbALL").config(conf=sparkConf).getOrCreate()
 spark.sparkContext.setLogLevel("ERROR")   # To reduce verbose output
 
 
@@ -35,6 +43,7 @@ df = spark \
   .readStream \
   .format("kafka") \
   .option("kafka.bootstrap.servers", kafkaServer) \
+  .option("failOnDataLoss", False)\
   .option("subscribe", topic) \
   .load()
 
@@ -131,12 +140,14 @@ model = PipelineModel.load(modelPath)
 #print("Intercept: {:.3f}".format(intercept))
 
 #lo manderò ad elastic search e visualizzo su kibana
+#adesso ho anche colonna features che erò non possò mandare a elatic perchè da problemi nella serializzazione 
+predictDf = model.transform(parseDf).select('name','season','rank','Predicted_rank')
 
-predictDf = model.transform(parseDf).select('name','season','features','rank','Predicted_rank')
+
+
+
 predictDf.writeStream \
-  .outputMode("append")\
-  .format('console')\
-  .option('truncate', value=False) \
-  .option("numRows",10000)\
-  .start()\
-  .awaitTermination()
+   .option("checkpointLocation", "/tmp/") \
+   .format("es") \
+   .start(elastic_index) \
+   .awaitTermination()
