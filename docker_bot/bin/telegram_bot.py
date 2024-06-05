@@ -22,6 +22,7 @@ import json
 
 
 # mi creo un dizionario di coppiue squadre id
+
 teams_dict = { "Inter": 505,
          "Milan": 489,
          "Juventus": 496,
@@ -87,7 +88,7 @@ async def fixtures_function(update: Update, context: ContextTypes.DEFAULT_TYPE) 
  
  
     #url = "https://v3.football.api-sports.io/standings?league=135&season=202"
-    for i in range(2022,2024):
+    for i in range(2023,2024):
       if i != 2011:
          time.sleep(5)  #tra una richiesta e l'altra si ferma 6 secondi
 

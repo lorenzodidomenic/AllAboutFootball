@@ -66,9 +66,9 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-            #TOKEN:  
+             TOKEN:  7190507006:AAF4E2TiAvtq6VzJxMvF3G1RDQsdWmgpaxQ 
              URL: https://v3.football.api-sports.io/standings?
-            #API-KEY: 
+             API-KEY: de48be3afdca7c3582798fb0273f6915
            networks: 
               tap:
                  ipv4_address: 10.0.100.23
@@ -78,6 +78,7 @@ services:
         container_name: spark
         volumes:
               - ./docker_spark/sparkApplication.py:/opt/tap/sparkApplication.py
+              - footbAllVolume:/tmp
         command: > 
              /opt/spark/bin/spark-submit --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1  /opt/tap/sparkApplication.py 
         networks: 
@@ -94,4 +95,5 @@ networks:
             config:
                  - subnet: 10.0.100.1/24
         external: true
-
+volumes:
+    footbAllVolume:
