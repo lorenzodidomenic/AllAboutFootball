@@ -73,11 +73,12 @@ services:
               tap:
                  ipv4_address: 10.0.100.23
     spark:
-        image: apache/spark
+        image: spark:latest
         hostname: spark
         container_name: spark
         volumes:
               - ./docker_spark/sparkApplication.py:/opt/tap/sparkApplication.py
+              - footbAllVolume:/tmp
         command: > 
              /opt/spark/bin/spark-submit --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1  /opt/tap/sparkApplication.py 
         networks: 
@@ -94,4 +95,5 @@ networks:
             config:
                  - subnet: 10.0.100.1/24
         external: true
-
+volumes:
+    footbAllVolume:
