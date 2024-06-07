@@ -35,17 +35,17 @@ spark.sparkContext.setLogLevel("ERROR")   # To reduce verbose output
 
 kafkaServer="kafkaServer:9092"
 topic = "topicCountries"
-modelPath = "/tmp/footbAllVolume/model"   #path dove ho salvato il mio modello
+modelPath = "/tmp/footbAllVolume/modelBundesliga"   #path dove ho salvato il mio modello
 
 
 #mi leggo lo stream da kafka
-df = spark \
-  .readStream \
-  .format("kafka") \
-  .option("kafka.bootstrap.servers", kafkaServer) \
-  .option("failOnDataLoss", False)\
-  .option("subscribe", topic) \
-  .load()
+#df = spark \
+ # .readStream \
+ # .format("kafka") \
+ # .option("kafka.bootstrap.servers", kafkaServer) \
+ # .option("failOnDataLoss", False)\
+ # .option("subscribe", topic) \
+ # .load()
 
 #df=df.selectExpr("CAST(timestamp AS STRING)","CAST(value AS STRING)") \
 #df.printSchema()  
@@ -81,11 +81,11 @@ schema = StructType([
   )])
 
 #il value json lo trasformiamo con quello schema e prendiamo le colonne
-parseDf = df.selectExpr("CAST(value AS STRING)") \
-    .select(from_json("value", schema).alias("data")) \
-    .select("data.parameters.season","data.response.league.standings.team.name","data.response.league.standings.rank",
-    "data.response.league.standings.points","data.response.league.standings.all.goals.for","data.response.league.standings.all.goals.against",
-    "data.response.league.standings.all.win","data.response.league.standings.all.draw","data.response.league.standings.all.lose").alias("text")\
+#parseDf = df.selectExpr("CAST(value AS STRING)") \
+ #   .select(from_json("value", schema).alias("data")) \
+  #  .select("data.parameters.season","data.response.league.standings.team.name","data.response.league.standings.rank",
+   # "data.response.league.standings.points","data.response.league.standings.all.goals.for","data.response.league.standings.all.goals.against",
+   # "data.response.league.standings.all.win","data.response.league.standings.all.draw","data.response.league.standings.all.lose").alias("text")\
 
 
 
@@ -113,18 +113,18 @@ featureassembler = VectorAssembler(inputCols = ["points","for","against","win","
 
 
 #PER TRAINARE IL MODELLO
-#training = spark.read.format("csv").options(header='true',inferschema='true',delimiter=",").load("/tmp/data.csv")
-#lr = LinearRegression(featuresCol="features",labelCol="rank",predictionCol="Predicted_rank")
-#pipeline = Pipeline(stages=[featureassembler,lr])
-#model = pipeline.fit(training)
+training = spark.read.format("csv").options(header='true',inferschema='true',delimiter=",").load("/tmp/data.csv")
+lr = LinearRegression(featuresCol="features",labelCol="rank",predictionCol="Predicted_rank")
+pipeline = Pipeline(stages=[featureassembler,lr])
+model = pipeline.fit(training)
 
 
 #PROVA
 #trainingPred = model.transform(training)
 #trainingPred.select('features','rank','Predicted_rank').show()
 
-model = PipelineModel.load(modelPath)
-#model.save("/tmp/footbAllVolume/model")   PER SALVARE IL MODELLO IN UN VOLUME CHE HO MONTATO
+# VVVVV model = PipelineModel.load(modelPath)  PER USARE IL MODELLO
+model.save("/tmp/footbAllVolume/modelLiga")  # PER SALVARE IL MODELLO IN UN VOLUME CHE HO MONTATO
 
 
 #pred_results = regressor.evalutate(test_data)
@@ -141,13 +141,20 @@ model = PipelineModel.load(modelPath)
 
 #lo manderò ad elastic search e visualizzo su kibana
 #adesso ho anche colonna features che erò non possò mandare a elatic perchè da problemi nella serializzazione 
-predictDf = model.transform(parseDf).select('name','season','rank','Predicted_rank')
+# vvvv predictDf = model.transform(parseDf).select('name','season','rank','Predicted_rank')
+
+#parseDf.writeStream \
+  #     .format("csv") \
+   #   .option("checkpointLocation", "checkpoint/")\
+    #   .option("path", "/tmp")\
+    #   .outputMode("append")\
+    #   .start()\
+     #  .awaitTermination()
 
 
-
-
-predictDf.writeStream \
-   .option("checkpointLocation", "/tmp/") \
-   .format("es") \
-   .start(elastic_index) \
-   .awaitTermination()
+##vvvvvv
+#predictDf.writeStream \
+   #.option("checkpointLocation", "/tmp/") \
+   #.format("es") \
+   #.start(elastic_index) \
+   #.awaitTermination()
