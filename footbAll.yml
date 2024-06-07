@@ -87,6 +87,7 @@ services:
             kafka-topics:
                 condition: service_completed_successfully   
     elasticsearch:
+        hostname: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
         environment:
             - discovery.type=single-node
@@ -97,7 +98,19 @@ services:
         networks: 
                 tap:
                     ipv4_address: 10.0.100.21
-                    
+    kibana:
+        hostname: kibana
+        image: docker.elastic.co/kibana/kibana:8.13.4
+        ports:
+          - 5601:5601
+        volumes:
+          - ./docker_kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+        depends_on:
+          kafka-topics:
+             condition: service_completed_successfully  
+        networks: 
+                tap:
+                    ipv4_address: 10.0.100.25       
 networks:
     tap:
         name: tap
