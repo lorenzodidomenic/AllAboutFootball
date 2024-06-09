@@ -45,7 +45,7 @@ services:
         image: apache/kafka:latest    #creo nuobo container solo per utilizzare l'eseguibile per creare un topic
         command: > 
                bash -c "
-               /opt/kafka/bin/kafka-topics.sh --create --topic topicCountries --bootstrap-server kafkaServer:9092"
+               /opt/kafka/bin/kafka-topics.sh --create --topic topicSerieA --bootstrap-server kafkaServer:9092"
         depends_on:
             - kafkaServer
         networks: 
@@ -65,7 +65,7 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-            # TOKEN:  
+           #  TOKEN:  
              URL: https://v3.football.api-sports.io/standings?
             # API-KEY: 
            networks: 
@@ -76,7 +76,7 @@ services:
         hostname: spark
         container_name: spark
         volumes:
-              - ./docker_spark/sparkApplication.py:/opt/tap/sparkApplication.py
+              - ./docker_spark:/opt/tap/
               - footbAllVolume:/tmp
         command: > 
              /opt/spark/bin/spark-submit --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.2,org.elasticsearch:elasticsearch-spark-30_2.12:8.13.4 /opt/tap/sparkApplication.py 

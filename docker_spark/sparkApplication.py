@@ -19,10 +19,7 @@ from pyspark.ml.pipeline import PipelineModel
 
 from pyspark.conf import SparkConf
 
-#creiamo lo Spark Context della nostra applicazione
-#sc = SparkContext(appName="PythonStructuredStreamsKafka")
-#spark = SparkSession(sc)
-#sc.setLogLevel("ERROR")
+
 
 elastic_index = "football"
 
@@ -34,7 +31,7 @@ spark.sparkContext.setLogLevel("ERROR")   # To reduce verbose output
 
 
 kafkaServer="kafkaServer:9092"
-topic = "topicCountries"
+topic = "topicSerieA"
 modelPath = "/tmp/footbAllVolume/model"   #path dove ho salvato il mio modello
 
 
@@ -93,7 +90,6 @@ parseDf = df.selectExpr("CAST(value AS STRING)") \
 #parseDf = parseDf.groupBy("name").agg(F.mean("rank").alias("media_rank"))
 
 
-
 featureassembler = VectorAssembler(inputCols = ["points","for","against","win","draw","lose"],outputCol = "features") #definisco le colonne che saranno i parametri della predizione
 #parseDf = featureassembler.transform(parseDf)
 
@@ -110,21 +106,11 @@ featureassembler = VectorAssembler(inputCols = ["points","for","against","win","
   #(90,70,15,31,6,1,1),
   #(88,78,16,30,6,2,2)
 #],["points","for","against","rank","win","draw","lose"])
-
-
-#PER TRAINARE IL MODELLO
-#training = spark.read.format("csv").options(header='true',inferschema='true',delimiter=",").load("/tmp/data.csv")
-#lr = LinearRegression(featuresCol="features",labelCol="rank",predictionCol="Predicted_rank")
-#pipeline = Pipeline(stages=[featureassembler,lr])
-#model = pipeline.fit(training)
-
-
-#PROVA
 #trainingPred = model.transform(training)
 #trainingPred.select('features','rank','Predicted_rank').show()
 
+
 model = PipelineModel.load(modelPath)
-#model.save("/tmp/footbAllVolume/model")   PER SALVARE IL MODELLO IN UN VOLUME CHE HO MONTATO
 
 
 #pred_results = regressor.evalutate(test_data)
@@ -139,13 +125,11 @@ model = PipelineModel.load(modelPath)
 #print("Coefficitents: ",coefficients)
 #print("Intercept: {:.3f}".format(intercept))
 
-#lo manderò ad elastic search e visualizzo su kibana
-#adesso ho anche colonna features che erò non possò mandare a elatic perchè da problemi nella serializzazione 
-predictDf = model.transform(parseDf).select('name','season','rank','Predicted_rank')
 
+#adesso ho anche colonna features che però non possò mandare a elatic perchè da problemi nella serializzazione 
+predictDf = model.transform(parseDf).select('name','season','rank','Predicted_rank',"for","against","win","draw","lose")
 
-
-
+#mando ad elastic
 predictDf.writeStream \
    .option("checkpointLocation", "/tmp/") \
    .format("es") \
