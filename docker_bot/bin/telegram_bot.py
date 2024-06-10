@@ -6,7 +6,7 @@ import time
 import os;
 import json 
 import random
-
+from telegram.constants import ParseMode
 
 # mi creo un dizionario di coppie squadre id, perchè la richiesta la posso fare solo con l'id della squadra
 teams_dict = { "Inter": 505,
@@ -34,10 +34,10 @@ teams_dict = { "Inter": 505,
 
 async def info_function(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
    message = "Command list: \n \
-               - analyze \n  To analyze and match predict Serie A standings from 2010 to 2023 \n \
-               - analyze \"year\" \n To analyze and match predict Serie A standing of the year \n \
-               - predict \"year\" \"team\" \n To predict position of a Serie A team with random stats \n \
-               - predict \"year\" \"points\" \"gf\" \"gs\" \"win\" \"draw\" \"lose\" \n To predict position of a Serie A team with some stats "
+               - /analyze \n  To analyze and match predict Serie A standings from 2010 to 2023 \n \
+               - /analyze \"year\" \n To analyze and match predict Serie A standing of the year \n \
+               - /predict \"year\" \"team\" \n To predict position of a Serie A team with random stats \n \
+               - /predict \"year\" \"gf\" \"gs\" \"win\" \"draw\" \"lose\" \n To predict position of a Serie A team with some stats "
    await update.message.reply_text(message)
 
 
@@ -130,14 +130,14 @@ async def predict_random_function(update: Update, context: ContextTypes.DEFAULT_
       
       team=year=points=win=lose=draw=gol_for=gol_against =  None
  
-      if(len(words)< 3 or (len(words)>3 and len(words)!= 9) or(len(words) > 9)):
-         await update.message.reply_text("Error in the parameters. Type \info for help ")
+      if(len(words)< 3 or (len(words)>3 and len(words)!= 8) or(len(words) > 8)):
+         await update.message.reply_text("Error in the parameters. Type /info for help ")
          return
       elif(len(words) == 3):
          team =  words[1]
          year = words[2]
 
-         points = random.randrange(0,100)
+        
          while True:
             win = random.randrange(0,39)  #per essere sicuro che il numero di partite perse, vinte  o pareggiato sia 38
             lose = random.randrange(0,39)
@@ -145,18 +145,19 @@ async def predict_random_function(update: Update, context: ContextTypes.DEFAULT_
             if (win+lose+draw == 38):
                break
       
-            gol_for = random.randrange(10,100)
-            gol_against = random.randrange(0,100)
+         gol_for = random.randrange(10,100)
+         gol_against = random.randrange(0,100)
+         points = win*3+draw*1
+
       else:
          team =  words[1]
          year = words[2]
-         points = words[3]
-         gol_for = words[4]
-         gol_against = words[5]
-         win = words[6]
-         lose = words[7]
-         draw = words[8]
-
+         gol_for = words[3]
+         gol_against = words[4]
+         win = words[5]
+         lose = words[6]
+         draw = words[7]
+         points = int(win)*3+int(draw)*1
       
        #mi creo quindi una stringa con dati random e lo trasformo in json e glielo mando 
       response = "{    \
@@ -193,7 +194,7 @@ async def predict_random_function(update: Update, context: ContextTypes.DEFAULT_
       r = requests.request("POST",url="http://10.0.100.22:8080",json=json_object)  #indirizzo ip di logstash nella rete dei container
 
    
-      await update.message.reply_text("Result elaborated. See it on http://localhost:5601")
+      await update.message.reply_text(" Result elaborated. See it on <a href='https://localhost:5601'> kibana </a> ",parse_mode = ParseMode.HTML)
    
 
 

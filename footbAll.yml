@@ -65,9 +65,9 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-           #  TOKEN:  
-             URL: https://v3.football.api-sports.io/standings?
-            # API-KEY: 
+            #TOKEN:  
+            URL: https://v3.football.api-sports.io/standings?
+            #API-KEY: 
            networks: 
               tap:
                  ipv4_address: 10.0.100.23

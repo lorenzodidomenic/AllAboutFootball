@@ -10,6 +10,7 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from pyspark.sql import functions as F
+from pyspark.sql.functions import udf
 
 from pyspark.ml.regression import LinearRegression
 from pyspark.ml.feature import VectorAssembler
@@ -22,17 +23,17 @@ from pyspark.conf import SparkConf
 
 
 elastic_index = "football"
-
 sparkConf = SparkConf().set("es.nodes","elasticsearch")\
                      .set("es.port","9200")
 
+
 spark = SparkSession.builder.appName("FootbALL").config(conf=sparkConf).getOrCreate()
-spark.sparkContext.setLogLevel("ERROR")   # To reduce verbose output
+spark.sparkContext.setLogLevel("ERROR")   
 
 
 kafkaServer="kafkaServer:9092"
 topic = "topicSerieA"
-modelPath = "/tmp/footbAllVolume/model"   #path dove ho salvato il mio modello
+modelPath = "/tmp/footbAllVolume/Completemodel"   #path dove ho salvato il mio modello, in un volume condiviso montato sul container
 
 
 #mi leggo lo stream da kafka
@@ -54,6 +55,7 @@ schema = StructType([
     StructField("parameters",StructType([
       StructField("season",StringType(),True)
     ])),
+    StructField("@timestamp",StringType(),True),
     StructField("response",StructType([
     StructField("league",StructType([
       StructField("standings",StructType([
@@ -80,7 +82,7 @@ schema = StructType([
 #il value json lo trasformiamo con quello schema e prendiamo le colonne
 parseDf = df.selectExpr("CAST(value AS STRING)") \
     .select(from_json("value", schema).alias("data")) \
-    .select("data.parameters.season","data.response.league.standings.team.name","data.response.league.standings.rank",
+    .select("data.parameters.season","data.@timestamp","data.response.league.standings.team.name","data.response.league.standings.rank",
     "data.response.league.standings.points","data.response.league.standings.all.goals.for","data.response.league.standings.all.goals.against",
     "data.response.league.standings.all.win","data.response.league.standings.all.draw","data.response.league.standings.all.lose").alias("text")\
 
@@ -125,9 +127,23 @@ model = PipelineModel.load(modelPath)
 #print("Coefficitents: ",coefficients)
 #print("Intercept: {:.3f}".format(intercept))
 
+#funzione per evitare che mi vengano predette posizioni inferiori allo 0 o superiori alla 20 esima 
+def map_(x):
+    if x <= 0: 
+      x =1.0 
+    elif x >= 20:
+      x= 20.0
+    else:
+      x=x
+    return x
+
+map_udf = udf(map_,FloatType())    #la trasformo in udf function
 
 #adesso ho anche colonna features che però non possò mandare a elatic perchè da problemi nella serializzazione 
-predictDf = model.transform(parseDf).select('name','season','rank','Predicted_rank',"for","against","win","draw","lose")
+#aggiungo funzione di map che se è negativo diventa 1 
+predictDf = model.transform(parseDf).select('@timestamp','name','season','rank','Predicted_rank',"for","against","win","draw","lose")
+predictDf = predictDf.withColumn("Predicted_rank",map_udf("Predicted_rank"))
+
 
 #mando ad elastic
 predictDf.writeStream \
