@@ -18,7 +18,7 @@ from pyspark.ml.pipeline import PipelineModel
 #from pyspark.ml.evaluation import RegressionEvaluator
 
 from pyspark.conf import SparkConf
-
+from pyspark.ml.evaluation import RegressionEvaluator
 
 spark = SparkSession.builder.appName("FootbALL").getOrCreate()
 spark.sparkContext.setLogLevel("ERROR")   # To reduce verbose output
@@ -37,8 +37,18 @@ def model_trainer(nome_file):
     return model
 
 
-#alleno il modello
+#l'ho usato per stamparmi il RMSE (circa 0.007)
+training = spark.read.format("csv").options(header='true',inferschema='true',delimiter=",").load("/tmp/data.csv")
 model = model_trainer("/tmp/data.csv")
+training_predictions = model.transform(training)
+evaluator = RegressionEvaluator(labelCol='rank', predictionCol='Predicted_rank', metricName='rmse')
+rmse = evaluator.evaluate(training_predictions)
+print("Root Mean Squared Error (RMSE) on test data:", rmse/20)
+
+#coefficients = lr_model.coefficients
+#intercept = lr_model.intercept
+#print("Coefficitents: ",coefficients)
+#print("Intercept: {:.3f}".format(intercept))
 
 #mi salvo il modello in un volume condiviso
 model.save("/tmp/footbAllVolume/Completemodel")   #PER SALVARE IL MODELLO IN UN VOLUME CHE HO MONTATO

@@ -45,9 +45,6 @@ df = spark \
   .option("subscribe", topic) \
   .load()
 
-#df=df.selectExpr("CAST(timestamp AS STRING)","CAST(value AS STRING)") \
-#df.printSchema()  
-#finora lo schema è (timestamp,value) dove value contiene un json 
 
 #definiamo lo schema del response
 #questo è lo schema del mio json
@@ -87,47 +84,10 @@ parseDf = df.selectExpr("CAST(value AS STRING)") \
     "data.response.league.standings.all.win","data.response.league.standings.all.draw","data.response.league.standings.all.lose").alias("text")\
 
 
-
-#parseDf = parseDf.filter(parseDf.name.contains('Roma')).groupBy("name").agg(F.collect_list("season").alias("season"),F.collect_list("rank").alias("rank"),F.collect_list("points").alias("points"),F.collect_list("for").alias("scored goals "),F.collect_list("against").alias("conceded_goals"))
-#parseDf = parseDf.groupBy("name").agg(F.mean("rank").alias("media_rank"))
+model = PipelineModel.load(modelPath)  #carico il modello
 
 
-featureassembler = VectorAssembler(inputCols = ["points","for","against","win","draw","lose"],outputCol = "features") #definisco le colonne che saranno i parametri della predizione
-#parseDf = featureassembler.transform(parseDf)
-
-#questo per prova
-#training = spark.createDataFrame([
-  #(90,98,15,33,4,1,1),
-  #(70,68,35,31,6,1,2),
- # (63,78,25,29,6,3,3),
-  #(58,90,30,26,10,2,6),
-  #(87,90,15,26,6,6,4),
-  #(80,88,29,25,10,3,4),
-  #(59,49,20,20,10,8,8),
- # (25,38,20,10,20,8,15),
-  #(90,70,15,31,6,1,1),
-  #(88,78,16,30,6,2,2)
-#],["points","for","against","rank","win","draw","lose"])
-#trainingPred = model.transform(training)
-#trainingPred.select('features','rank','Predicted_rank').show()
-
-
-model = PipelineModel.load(modelPath)
-
-
-#pred_results = regressor.evalutate(test_data)
-#pred_results.predictions.show()
-#predictions = model.trasform(test_data)
-#evaluator = RegressionEvaluator(labelCol='label_column',predictionCol='prediction',metricName='rmse')
-#rmse = evaluator.evaluate(predictions)
-#print("Root Mean Squared Error on test data: ",rmse)
-
-#coefficients = lr_model.coefficients
-#intercept = lr_model.intercept
-#print("Coefficitents: ",coefficients)
-#print("Intercept: {:.3f}".format(intercept))
-
-#funzione per evitare che mi vengano predette posizioni inferiori allo 0 o superiori alla 20 esima 
+#user defined function per evitare che mi vengano predette posizioni inferiori allo 0 o superiori alla 20 esima 
 def map_(x):
     if x <= 0: 
       x =1.0 
@@ -139,8 +99,7 @@ def map_(x):
 
 map_udf = udf(map_,FloatType())    #la trasformo in udf function
 
-#adesso ho anche colonna features che però non possò mandare a elatic perchè da problemi nella serializzazione 
-#aggiungo funzione di map che se è negativo diventa 1 
+
 predictDf = model.transform(parseDf).select('@timestamp','name','season','rank','Predicted_rank',"for","against","win","draw","lose")
 predictDf = predictDf.withColumn("Predicted_rank",map_udf("Predicted_rank"))
 
@@ -151,3 +110,5 @@ predictDf.writeStream \
    .format("es") \
    .start(elastic_index) \
    .awaitTermination()
+
+spark.stop()
