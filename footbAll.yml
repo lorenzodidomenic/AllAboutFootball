@@ -42,7 +42,7 @@ services:
         depends_on:
             - kafkaServer
     kafka-topics:
-        image: apache/kafka:latest    #creo nuobo container solo per utilizzare l'eseguibile per creare un topic
+        image: apache/kafka:latest    
         command: > 
                bash -c "
                /opt/kafka/bin/kafka-topics.sh --create --topic topicSerieA --bootstrap-server kafkaServer:9092"
@@ -52,7 +52,7 @@ services:
             - tap
     logstash: 
         image: docker.elastic.co/logstash/logstash:8.13.0
-        container_name: Logstash
+        container_name: logstash
         environment:
                 XPACK_MONITORING_ENABLED: "false"
        #ports:
@@ -65,7 +65,7 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-            #TOKEN:  
+            #TOKEN:   
             URL: https://v3.football.api-sports.io/standings?
             #API-KEY: 
            networks: 
