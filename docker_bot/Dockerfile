@@ -1,4 +1,5 @@
 FROM python 
+
 #mi serve per poter eseguire il file python direttamente
 ENV PATH /usr/src/app/bin:$PATH
 WORKDIR  /usr/src/app

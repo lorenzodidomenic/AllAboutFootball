@@ -9,14 +9,11 @@ from pyspark.streaming import StreamingContext
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-from pyspark.sql import functions as F
-from pyspark.sql.functions import udf
 
 from pyspark.ml.regression import LinearRegression
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import Pipeline
 from pyspark.ml.pipeline import PipelineModel
-#from pyspark.ml.evaluation import RegressionEvaluator
 
 from pyspark.conf import SparkConf
 
