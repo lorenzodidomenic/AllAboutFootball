@@ -25,7 +25,7 @@ MENU = " Command list:  \n \
 - /analyze \nTo analyze and compare exepected Serie A standings from 2010 to 2023 \n \
 - /analyze \"year\" \nTo analyze and compare exepected Serie A standing of the year \n \
 - /predict \"team\" \"year\" \n To predict position of a Serie A team with random stats \n \
-- /predict \"team\" \"tear\" \"win\" \"draw\" \"lose\" \"g_f\" \"g_a\" \n To predict position of a Serie A team with some stats \n \
+- /predict \"team\" \"year\" \"win\" \"draw\" \"lose\" \"g_f\" \"g_a\" \n To predict position of a Serie A team with some stats \n \
 - /simulate \"year\" To simulate the standing of the year with random stats \n"
 
 ELABORATED = "Results Elaborated. See it on Kibana "
