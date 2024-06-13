@@ -53,7 +53,7 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-            TOKEN:  
+            TOKEN:   
             URL: https://v3.football.api-sports.io/standings?
             API-KEY: 
            networks: 

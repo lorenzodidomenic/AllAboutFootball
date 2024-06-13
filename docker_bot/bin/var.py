@@ -28,7 +28,7 @@ MENU = " Command list:  \n \
 - /predict \"team\" \"year\" \"win\" \"draw\" \"lose\" \"g_f\" \"g_a\" \n To predict position of a Serie A team with some stats \n \
 - /simulate \"year\" To simulate the standing of the year with random stats \n"
 
-ELABORATED = "Results Elaborated. See it on Kibana "
+ELABORATED = "Result Elaborated. See it on Kibana "
 
 ERROR = "Error in the parameters. Command /info for help"
 
