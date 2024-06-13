@@ -89,7 +89,7 @@ model = PipelineModel.load(modelPath)  #carico il modello
 
 #user defined function per evitare che mi vengano predette posizioni inferiori allo 0 o superiori alla 20 esima 
 def map_(x):
-    if x <= 0: 
+    if x <= 1: 
       x =1.0 
     elif x >= 20:
       x= 20.0

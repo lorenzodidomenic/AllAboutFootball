@@ -8,39 +8,10 @@ import json
 import random
 from telegram.constants import ParseMode
 
-# mi creo un dizionario di coppie squadre id, perchè la richiesta la posso fare solo con l'id della squadra
-teams_dict = { "Inter": 505,
-         "Milan": 489,
-         "Juventus": 496,
-         "Atalanta": 499,
-         "Bologna": 500,
-         "Roma": 497,
-         "Lazio": 487,
-         "Fiorentina": 502,
-         "Torino": 503,
-         "Napoli": 492,
-         "Genoa": 495,
-         "Monza": 1579,
-         "Verona": 504,
-         "Lecce": 867,
-         "Udinese": 494,
-         "Cagliari": 490,
-         "Empoli": 511,
-         "Frosinone": 512,
-         "Sassuolo": 488,
-         "Salernitana": 514
-  }
+from functions import generate_json
+from var import teams_dict,MENU,ELABORATED,ERROR
 
-MENU = " Command list:  \n \
-- /analyze \nTo analyze and compare exepected Serie A standings from 2010 to 2023 \n \
-- /analyze \"year\" \nTo analyze and compare exepected Serie A standing of the year \n \
-- /predict \"year\" \"team\" \n To predict position of a Serie A team with random stats \n \
-- /predict \"year\" \"team\" \"gf\" \"gs\" \"win\" \"draw\" \"lose\" \n To predict position of a Serie A team with some stats \n \
-- /simulate \"year\" To simulate the standing of the year with random stats \n"
 
-ELABORATED = "Results Elaborated. See it on Kibana "
-
-ERROR = "Error in the parameters. Command /info for help"
 
 #per rispondere con le funzionalità possibili del bot
 async def info_function(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
