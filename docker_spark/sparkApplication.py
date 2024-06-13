@@ -9,14 +9,11 @@ from pyspark.streaming import StreamingContext
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-from pyspark.sql import functions as F
-from pyspark.sql.functions import udf
 
 from pyspark.ml.regression import LinearRegression
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import Pipeline
 from pyspark.ml.pipeline import PipelineModel
-#from pyspark.ml.evaluation import RegressionEvaluator
 
 from pyspark.conf import SparkConf
 
@@ -89,7 +86,7 @@ model = PipelineModel.load(modelPath)  #carico il modello
 
 #user defined function per evitare che mi vengano predette posizioni inferiori allo 0 o superiori alla 20 esima 
 def map_(x):
-    if x <= 0: 
+    if x <= 1: 
       x =1.0 
     elif x >= 20:
       x= 20.0

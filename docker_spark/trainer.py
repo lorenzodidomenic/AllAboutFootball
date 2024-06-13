@@ -15,9 +15,7 @@ from pyspark.ml.regression import LinearRegression
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import Pipeline
 from pyspark.ml.pipeline import PipelineModel
-#from pyspark.ml.evaluation import RegressionEvaluator
 
-from pyspark.conf import SparkConf
 from pyspark.ml.evaluation import RegressionEvaluator
 
 spark = SparkSession.builder.appName("FootbALL").getOrCreate()
@@ -45,10 +43,6 @@ evaluator = RegressionEvaluator(labelCol='rank', predictionCol='Predicted_rank',
 rmse = evaluator.evaluate(training_predictions)
 print("Root Mean Squared Error (RMSE) on test data:", rmse/20)
 
-#coefficients = lr_model.coefficients
-#intercept = lr_model.intercept
-#print("Coefficitents: ",coefficients)
-#print("Intercept: {:.3f}".format(intercept))
 
 #mi salvo il modello in un volume condiviso
-model.save("/tmp/footbAllVolume/Completemodel")   #PER SALVARE IL MODELLO IN UN VOLUME CHE HO MONTATO
+model.save("/tmp/footbAllVolume/Completemodel")   

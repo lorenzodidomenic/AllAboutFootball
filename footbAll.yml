@@ -29,18 +29,6 @@ services:
         networks: 
               tap:
                  ipv4_address: 10.0.100.24
-    kafka-ui:
-        image: provectuslabs/kafka-ui:latest
-        container_name: kafkaWebUI
-        environment:
-            - KAFKA_CLUSTERS_0_NAME=local
-            - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafkaServer:9092
-        ports: 
-            - 8082:8080
-        networks: 
-            - tap
-        depends_on:
-            - kafkaServer
     kafka-topics:
         image: apache/kafka:latest    
         command: > 
@@ -65,9 +53,9 @@ services:
     telegram_bot:
            image: telegram_bot:latest
            environment:
-            # TOKEN:   
+            TOKEN:  
             URL: https://v3.football.api-sports.io/standings?
-            # API-KEY: 
+            API-KEY: 
            networks: 
               tap:
                  ipv4_address: 10.0.100.23
