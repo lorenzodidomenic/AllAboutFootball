@@ -1,7 +1,7 @@
 **SA&P**
 
 ***SA&P*** (SerieA Analysis And Prediction) 
-is a project based on the studying of data from the Serie A rankings from 2005 to 2023 in order to analyze the rankings from years ago and to be able to 
+is a project based on the studying of Serie A teams data from 2005 to 2023 in order to analyze the rankings of previous years and to be able to 
 predict future standings based on certain club statistics.
 
 You can see more details about the application in [Sa&p doc](https://github.com/lorenzodidomenic/AllAboutFootball/blob/main/docs/Presentation.ipynb)
