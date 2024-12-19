@@ -13,7 +13,7 @@ You can see more details about the application in [Sa&p doc](https://github.com/
 - Docker Engine
 - Download the Kibana Dashboard on [Dashboards](https://github.com/lorenzodidomenic/AllAboutFootball/blob/main/DASHBOARD.ndjson)
 
-*** How do you run the app ***
+***How do you run the app***
 
 1) Go into the project folder
 2) Change in the **footbAll.yml** file the TOKEN and API env variable with your token 
